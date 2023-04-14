@@ -1,3 +1,7 @@
+import PySimpleGUI as sg
+
+sg.theme('dark grey 9')
+
 class Conta:
     def __init__(self, nome, saldo, min_saldo):
         self.nome = nome
@@ -42,49 +46,146 @@ def criar_conta(tipo_conta, nome, quantia):
     else:
         print("\nPor favor, digite um valor válido!")
 
-print("\nBem vindo ao Banco, por favor selecione o tipo de conta que gostaria de abrir:\n")
-print("1 - Conta Corrente\n2 - Conta Poupança")
+## Criação do GUI para input dos dados
 
-tipo_conta = int(input("\nDigite o tipo da conta: ").strip())
+layout = [  [sg.Text('Bem vindo ao Banco, por favor selecione o tipo de conta que gostaria de abrir:')],
+            [sg.Text('1 - Conta Corrente\n2 - Conta Poupança')],
+            [sg.Text('Digite o tipo da conta:', size = (20,1)), sg.InputText()],
+            [sg.Text('Digite o seu nome:', size = (20,1)), sg.InputText()],
+            [sg.Text('Qual será o deposito inicial:', size = (20,1)), sg.InputText()],
+            [sg.Button('Ok',bind_return_key=True), sg.Button('Cancel')] ]
 
-nome = input("\nCerto, qual o seu nome: ").capitalize()
-
-## Checa em um loop se o valor do deposito inserido foi um número e não uma string
+window = sg.Window('Banco', layout)
 
 while True:
-    
-    quantia = input("\nQual será o deposito inicial: ") 
-
-    try:
-        quantia = int(quantia)
+    event, values = window.read()
+    if event == 'Ok':
+        tipo_conta = int(values[0])
+        nome = (values[1]).capitalize()
+        if nome.isdigit() == True:
+            sg.popup_ok("Por favor, digite um nome válido!")
+            continue
+        quantia = int(values[2])
         break
-    except ValueError:
-        print("Por favor, digite um valor em número!\n")
+    elif event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
+        exit()
+
+window.close()
 
 Conta = criar_conta(tipo_conta, nome, quantia)
 
 def excluir_conta(Conta):
     print("\nConta excluída com sucesso!\n")
     del Conta
-    
-print ("\nO que deseja fazer:\n1 - Depositar\n2 - Sacar\n3 - Saldo\n4 - Informaçoes da Conta\n5 - Excluir Conta")
+
+layout = [  [sg.Text('O que deseja fazer:')],
+            [sg.Text('1 - Depositar\n2 - Sacar\n3 - Saldo\n4 - Informaçoes da Conta\n5 - Excluir Conta')],
+            [sg.Text('Digite a opção:', size = (15,1)), sg.InputText()],
+            [sg.Button('Ok',bind_return_key=True), sg.Button('Cancel')] ]
+
+window = sg.Window('Bem vindo ao Banco', layout)
 
 while True:
-    opcao = int(input("Digite a opção: ").strip())
-    if opcao == 1:
-        quantia = int(input("Qual será o valor do deposito: ").strip())
-        Conta.depositar(quantia)
-    elif opcao == 2:
-        quantia = int(input("Qual será o valor do saque: ").strip())
-        Conta.sacar(quantia)
-    elif opcao == 3:
-        Conta.extrato()
-    elif opcao == 4:
-        print(Conta)
-    elif opcao == 5:
-        excluir_conta(Conta)
+    event, values = window.read()
+    if event == 'Ok':
+        opcao = int(values[0])
         break
-    else:
-        print("Por favor, digite um valor válido!")
+    elif event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
+        exit()
+        
+window.close()
+
+if opcao == 1:
+    layout = [  [sg.Text('Qual será o valor do depósito:', size = (22,1)), sg.InputText()],
+                [sg.Button('Ok',bind_return_key=True), sg.Button('Cancel')] ]
+    
+    window = sg.Window('Faça o seu depósito', layout)
+    
+    while True:
+        event, values = window.read()
+        if event == 'Ok':
+            quantia = int(values[0])
+            Conta.depositar(quantia)
+            break
+        elif event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
+            break
+        
+    window.close()
+    
+elif opcao == 2:
+    layout = [  [sg.Text('Qual será o valor do saque:', size = (22,1)), sg.InputText()],
+                [sg.Button('Ok',bind_return_key=True), sg.Button('Cancel')] ]
+    
+    window = sg.Window('Faça o seu saque', layout)
+    
+    while True:
+        event, values = window.read()
+        if event == 'Ok':
+            quantia = int(values[0])
+            Conta.sacar(quantia)
+            break
+        elif event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
+            break
+        
+    window.close()
+ ## arrumar    
+elif opcao == 3:
+    layout = [  [sg.Text('Saldo da Conta:{}'.format(Conta.extrato()), size = (22,1)) ],
+                [sg.Button('Ok',bind_return_key=True)] ]
+    
+    window = sg.Window('Seu Extrato', layout)
+    
+    while True:
+        event, values = window.read()
+        if event == 'Ok':
+            break
+        
+    window.close()
+    
+elif opcao == 4:
+    layout = [  [sg.Text('Conta:{}'.format(Conta), size = (22,1)) ],
+                [sg.Button('Ok',bind_return_key=True)] ]
+    
+    window = sg.Window('Informaçães da Conta', layout)
+    
+    while True:
+        event, values = window.read()
+        if event == 'Ok':
+            break
+        
+    window.close()        
+    
+elif opcao == 5:
+    layout = [  [sg.Text('Deseja excluir a conta?'), sg.Text('S/N')],
+                [sg.Button('Sim',bind_return_key=True), sg.Button('Não')] ]
+    
+    window = sg.Window('Excluir Conta', layout)
+    
+    while True:
+        event, values = window.read()
+        if event == 'Sim':
+            excluir_conta(Conta)
+            break 
+        elif event == 'Não':
+            break
+            
+    window.close()
+
+# while True:
+#     if opcao == 1:
+#         quantia = int(input("Qual será o valor do deposito: ").strip())
+#         Conta.depositar(quantia)
+#     elif opcao == 2:
+#         quantia = int(input("Qual será o valor do saque: ").strip())
+#         Conta.sacar(quantia)
+#     elif opcao == 3:
+#         Conta.extrato()
+#     elif opcao == 4:
+#         print(Conta)
+#     elif opcao == 5:
+#         excluir_conta(Conta)
+#         break
+#     else:
+#         print("Por favor, digite um valor válido!")
 
     
