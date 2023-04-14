@@ -15,7 +15,7 @@ class Conta:
         if self.saldo - quantia >= self.min_saldo:
             self.saldo -= quantia
         else:
-            print("Desculpa, sem fundos suficientes!")
+            sg.popup_ok("Desculpe, sem fundos suficientes!")
 
     def extrato(self):
         print("Saldo da Conta: R${}".format(self.saldo))
